@@ -1,0 +1,86 @@
+
+menu "Example Configuration"
+
+    config EXAMPLE_BOARD_BUTTON_GPIO
+        int "Physical Button GPIO"
+        default 19
+        help
+            GPIO number connected to the physical push button.
+            Pressing the button toggles the smart switch ON/OFF.
+
+    config EXAMPLE_ENABLE_TEST_NOTIFICATIONS
+        bool "Test Notifications"
+        default n
+        help
+            Enable this option to test mobile push notifications.
+            When enabled, turning on the switch using the push
+            button triggers a parameter notification, while
+            turning off the switch triggers an alert.
+
+    config EXAMPLE_OUTPUT_GPIO
+        int "Output GPIO"
+        default 18
+        help
+            GPIO number connected to the smart switch output.
+            GPIO 18 controls an external LED for testing.
+
+    choice LED_TYPE
+        prompt "LED Type"
+        default LED_TYPE_RGB if IDF_TARGET_ESP32C2
+        default LED_TYPE_NONE if IDF_TARGET_ESP32
+        default LED_TYPE_WS2812
+        help
+            Select the type of LED indicator to use.
+
+        config LED_TYPE_RGB
+            bool "RGB LED (3-pin RGB LED)"
+            help
+                Use a 3-pin RGB LED with separate GPIO pins.
+
+        config LED_TYPE_WS2812
+            bool "WS2812 LED Strip"
+            help
+                Use a WS2812 addressable LED strip.
+
+        config LED_TYPE_NONE
+            bool "No LED"
+            help
+                Disable the separate LED indicator.
+                The GPIO 18 switch output remains available.
+    endchoice
+
+    config RGB_LED_RED_GPIO
+        int "RGB LED Red GPIO"
+        default 0
+        depends on LED_TYPE_RGB
+
+    config RGB_LED_GREEN_GPIO
+        int "RGB LED Green GPIO"
+        default 1
+        depends on LED_TYPE_RGB
+
+    config RGB_LED_BLUE_GPIO
+        int "RGB LED Blue GPIO"
+        default 8
+        depends on LED_TYPE_RGB
+
+    config RGB_LED_ACTIVE_LEVEL_HIGH
+        bool "RGB LED Active Level High"
+        default n
+        depends on LED_TYPE_RGB
+
+    config WS2812_LED_GPIO
+        int "WS2812 LED GPIO"
+        default 27 if IDF_TARGET_ESP32C5
+        default 8 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H2
+        default 48 if IDF_TARGET_ESP32S3
+        default 18
+        depends on LED_TYPE_WS2812
+
+    config WS2812_LED_COUNT
+        int "Number of WS2812 LEDs"
+        default 1
+        range 1 256
+        depends on LED_TYPE_WS2812
+
+endmenu
